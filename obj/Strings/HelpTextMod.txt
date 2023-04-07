@@ -1,0 +1,42 @@
+Mod commands: mod permission in guild required. 
+
+To manipulate the bingo list. 
+
+	Bingo list entries cannot contain the following: <, >, "Free", ", '. < will be changed to "[", ">" to "]".  " and ' will be removed. "Free" will be changed to "Free square".
+
+	!bingo list view
+		Print list in thread with index. Index can be used with commands below. 
+
+	!bingo list output
+		This does the same as view, but attaches the list as a file. If there are many changes, you may wish to download this, amend it, then reupload using replacelist. 
+		
+	!bingo list replacelist <file>
+		This will replace the entire list with the entries in an attached file.
+		Please be careful with this. 
+		The file should be a text file, and have one line per bingo entry. 
+		If it starts with a number and a fullstop, e.g. "20. It's all chat's fault", then the number and full stop will be removed. So you can download, ammend and reupload without worrying about formatting. 
+
+	!bingo list add "example"
+		This adds an entry to the bingo list, called "example".
+		
+	!bingo list remove n
+		This removes the bingo list entry numbered n. Use the view command to see the numbered list. 
+		Note that the numbering will reset with changes after the date or version is changed, or the sort command. 
+		
+	!bingo list change n ""
+		Changes the text of the n item. 
+		
+	!bingo list sort
+		This resorts and reindexes the bingo list. 
+		
+Other:
+	!bingo date
+		prints the date and version.
+	!bingo date "01/01/00"
+		This changes the date on the bingo cards. 
+	!bingo version 
+		This increments changes the version on the bingo card, for if more than one bingo session is run on one day. 
+	!bingo version n
+		Sets the version to n.
+	
+	Cards will be the same for a user on a date and version, if the guild owner has enabled this option. 
