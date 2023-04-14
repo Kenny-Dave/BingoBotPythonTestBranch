@@ -27,6 +27,7 @@
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BingoCardListFactoryModule.py" />
     <Compile Include="botModule.py" />
     <Compile Include="CardGenModule.py">
       <SubType>Code</SubType>
@@ -34,8 +35,12 @@
     <Compile Include="AllBingoListFactoryModule.py">
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="allBingoItemRemovedModule.py">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="XML.py" />
     <Compile Include="XMLDateVer.py" />
-    <Compile Include="XML.py">
+    <Compile Include="XMLBingoCards.py">
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="TextWrap.py">

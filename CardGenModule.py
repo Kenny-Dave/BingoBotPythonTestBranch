@@ -75,9 +75,9 @@ class CardGenClass():
                 self.fontColor="black"
                 self.fontFooterColor="black"
 
-                titleFont= ImageFont.truetype(self.fontPath,self.titleFontSize)
+                titleFont= ImageFont.truetype(s.fontPath,s.titleFontSize)
 
-                draw.text(xy=(titleBoxSize[0]/2,titleBoxSize[1]/2),text=self.titleStr,font=titleFont,anchor="mm", \
+                draw.text(xy=(titleBoxSize[0]/2,titleBoxSize[1]/2),text=s.titleStr,font=titleFont,anchor="mm", \
                         fill=self.fontColor,align="center")
             
             #picture for title 

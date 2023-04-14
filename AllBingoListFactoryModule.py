@@ -16,8 +16,8 @@ def NewAllBingoItem(rawText,index):
 class AllBingoItemClass():
 
     rawText=""
-    formattedText=""
-    fontSize=0
+    #formattedText=""
+    #fontSize=0
     index=0
 
     def __init__(self,rawText=rawText,index=index):

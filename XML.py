@@ -19,6 +19,8 @@ rawText=""
 formattedText =""
 fontSize=0
 
+#print("XML instance pops on boot") #It does. 
+
 def readList():
     #reads allBingoList from XML
     rawText=""

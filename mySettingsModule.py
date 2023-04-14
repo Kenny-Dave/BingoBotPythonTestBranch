@@ -42,6 +42,8 @@ class mySettingsClass:
     DONE Write the help file to return.
     DONE Check the input file strip.
     DONE Option for printing the footers
+
+    Delete the picture cards when the date or version changes. 
     
     On off switch for assigning bingo cards. 
 
@@ -49,8 +51,12 @@ class mySettingsClass:
     It also falls over on the moderator guild permission, because user doesn't have this property. Could either do something clever, or not.
     Echo says only one guild for this list.
 
-    Add in card consistency, which means a list of objects of these. 
-    Which also means serialisation.
+    DONE Add in card consistency, which means a list of objects of these. 
+    DONE Which also means serialisation.
+    Add a flipper option for this. To also control the behaviour for the sorting. Keep the CardDB, but replace the entry rather than returning the existing.
+    Or just delete the CardDB saving?
+
+    Add options for viewing or controlling the cardDB from Discord. 
 
     Add the formatted text to the allBingoList and flip the logic so it's just pulling that rather than calcing every time. 
 
@@ -134,7 +140,7 @@ class mySettingsClass:
     FSBackgroundColor = "yellow"
     FSBackgroundOpacity = 100 # 0 is completely transparent, 255 is solid.
 
-    fileVersion = "0.1A"
+    fileVersion = "0.2A"
     freeSquareText="Free"
 
     """
