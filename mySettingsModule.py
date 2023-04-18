@@ -74,9 +74,9 @@ class mySettingsClass:
     Add a reissue command: would need to store more than a string for the userName in cardList. 
 
     Add lower to the message before splitting into messageList. 
-    See what else Brian said and tick them all off. 
+    See what else Brian said and tick them all off. This is in the code-monkeys thread
 
-    Summary of all the learnings in folder, and all the changes required. 
+    DONE Summary of all the learnings in folder, and all the changes required. 
 
     Linting botModule
     Linting CardGenModule
@@ -178,7 +178,7 @@ class mySettingsClass:
     FSBackgroundColor = "yellow"
     FSBackgroundOpacity = 100 # 0 is completely transparent, 255 is solid.
 
-    fileVersion = "0.2A"
+    fileVersion = "0.3A"
     freeSquareText="Free"
 
     """
