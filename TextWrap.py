@@ -1,7 +1,7 @@
 from PIL import Image, ImageDraw, ImageFont
-from mySettingsModule import mySettingsClass
+from mySettingsModule import mySettingsClass as s
 
-s = mySettingsClass
+#s = mySettingsClass
 
 #make a test box the same size as the boxes on the finished bingo card.
 boxImTestBox = (0,0,s.boxSize-s.boxPadding,s.boxSize-s.boxPadding)
@@ -68,4 +68,4 @@ def text_box(text, font, **kwargs):
             return (true_lines, font)
 
         else:
-            font =ImageFont.truetype(mySettingsClass.fontPath,font.size-1) #else try again with a smaller font. 
+            font =ImageFont.truetype(s.fontPath,font.size-1) #else try again with a smaller font. 

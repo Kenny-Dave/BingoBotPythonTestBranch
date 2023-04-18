@@ -39,6 +39,7 @@
       <SubType>Code</SubType>
     </Compile>
     <Compile Include="XML.py" />
+    <Compile Include="XMLSettings.py" />
     <Compile Include="XMLDateVer.py" />
     <Compile Include="XMLBingoCards.py">
       <SubType>Code</SubType>

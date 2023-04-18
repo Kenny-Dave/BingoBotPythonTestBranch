@@ -11,6 +11,7 @@ from discord import File #, Member, Attachment
 import XML
 import XMLBingoCards
 import XMLDateVer
+import XMLSettings
 
 import pathlib
 from datetime import datetime
@@ -40,7 +41,11 @@ XMLBingoCards.readList()
 #print ("Len card list: "+str(len(c.bingoCardList)))
 
 global bingoDate
+
 bingoDate, v = XMLDateVer.readDateVer()
+global cardsActive
+cardsActive = XMLSettings.ReadCardsActive()
+print (cardsActive)
 global bingoDateStr
 bingoDateStr = bingoDate.strftime("%d/%m/%y")
 
@@ -65,8 +70,6 @@ def sortBingo():
     for it in b.allBingoList:
         #print(it.rawText)
         it.index = b.allBingoList.index(it)+1
-
-    
 
 def clean(rawText):
 
@@ -103,6 +106,7 @@ async def on_ready():
 @client.event
 async def on_message(message, *args, **kwargs):
 
+    #generates a card image to return to the user
     #this function has to be here as it uses message, so needs the on_message to be initialized.
     def printCard(drawPrintable):
         userName=message.author.name
@@ -111,12 +115,20 @@ async def on_message(message, *args, **kwargs):
         bingoItemList = []
         addCardToList = True
 
-        #check if the card already exists in the db and pick up the bingoList if so
-        for ec in c.bingoCardList:
-            if ec.userName==userName:
-                bingoItemList=ec.bingoItemList
-                addCardToList = False
-                break
+        if s.idempotentCardRequest == True:
+            #check if the card already exists in the db and pick up the bingoList if so
+            for ec in c.bingoCardList:
+                if ec.userName==userName:
+                    bingoItemList=ec.bingoItemList
+                    addCardToList = False
+                    break
+
+        if s.idempotentCardRequest == False:
+            #remove the existing card for the user, before building a new one.
+            for ec in c.bingoCardList:
+                if ec.userName==userName:
+                    c.bingoCardList.remove(ec)
+                    break
 
         #if new request, generate bingoList
         #print ("Len bingo item list: "+str(len(bingoItemList)))
@@ -140,8 +152,6 @@ async def on_message(message, *args, **kwargs):
 
         return bingoCardIO, bingoCardFileName
 
-
-
     #exits if message is from self, to avoid loops
     if message.author == client.user:
         return
@@ -152,14 +162,23 @@ async def on_message(message, *args, **kwargs):
 
     if message.content.startswith("!bingo"):
 
+            replyContent =""
+            global cardsActive
+
         #try:
             #draws standard bingo card
             if len(messageList)==1: 
 
+
+
                 if s.arrayX**2>len(b.allBingoList):
-                    content = "There are not enough items in the bingo list to generate a card. " \
+                    replyContent = "There are not enough items in the bingo list to generate a card. " \
                         +str(len(b.allBingoList)+" items, card settings is "+s.arrayX+" squared.")
-                    await message.channel.send(content)
+                    await message.channel.send(replyContent)
+                elif cardsActive == False:
+                    replyContent = "Bingo card issue is not presently active. Please speak to a mod if you require further information, read up the thread, or wait patiently :)"
+                    await message.channel.send(replyContent)
+
                 else:
                     
                     drawPrintable=False
@@ -173,14 +192,16 @@ async def on_message(message, *args, **kwargs):
                         await message.author.send(file=bingoCardIO)
                         print(bingoCardFileName+" sent to user.")
 
-
-
             #draws low ink bingo card
             elif messageList[1]=="printable":
             
                 if s.arrayX**2>len(b.allBingoList):
-                    content = "There are not enough items in the bingo list to generate a card. "+str(len(b.allBingoList)+" items, card settings is "+s.arrayX+" squared.")
-                    await message.channel.send(content)
+                    replyContent = "There are not enough items in the bingo list to generate a card. "+str(len(b.allBingoList)+ \
+                        " items, card settings is "+s.arrayX+" squared.")
+                    await message.channel.send(replyContent)
+                elif cardsActive == False:
+                    replyContent = "Bingo card issue is not presently active. Please speak to a mod if you require further information, read up the thread, or wait patiently :)"
+                    await message.channel.send(replyContent)
                 else:
                     drawPrintable=True
 
@@ -195,34 +216,42 @@ async def on_message(message, *args, **kwargs):
             
             #returns standard about message
             elif messageList[1]=="about":
-                content = "Discord bingoBot version "+s.fileVersion+" \nWritten by Kenny Dave."
-                await message.channel.send(content)
+                replyContent = "Discord bingoBot version "+s.fileVersion+" \nWritten by Kenny Dave."
+                await message.channel.send(replyContent)
 
             #Prints the contents of the helpfile to the thread
             elif messageList[1]=="?":
 
                 #user commands help file
                 if len(messageList)==2:
-                    helpfile =parentPathStr+"\\obj\\strings\HelpText.txt"
-                
-                #mod commands help file
-                elif messageList[2]=="mod":
-                    helpfile =parentPathStr+"\\obj\\strings\HelpTextMod.txt"
+                    helpfile =parentPathStr+"\\obj\\HelpStrings\HelpText.txt"
 
                 #flexible addition for end owner. Will print any file in the folder if the input matches the file name.
                 #add text to help file if this is done. 
                 else: 
-                    helpfile =parentPathStr+"\\obj\\strings\""+messageList[2]+".txt"
+                    helpfile =parentPathStr+"\\obj\\HelpStrings\\"+messageList[2]+".txt"
 
                 with open(helpfile,"r") as f:
-                    content = "".join(f.readlines())
-                    await message.channel.send(content)
+                    replyContent = "".join(f.readlines())
+                    await message.channel.send(replyContent)
                 f.close
 
             #commands beyond this point are restricted to moderators only, for amending lists etc.
             #currently causes failure for DMs. Need to set it to check the modmin permission for the attached guild.
             elif message.author.guild_permissions.moderate_members==False:
                 await message.channel.send("Only moderators have permission to access mod commands, and you do not seem to.")
+
+            #make card issue active or inactive
+            elif messageList[1]=="toggleactive":
+                if cardsActive == True:
+                    cardsActive = False 
+                    replyContent = "Card issue is now inactive. Users will not be able to request a card."
+                    XMLSettings.WriteCardsActive(cardsActive)
+                else:
+                    cardsActive = True 
+                    replyContent = "Card issue is now active. Users will be able to request a card."
+                    XMLSettings.WriteCardsActive(cardsActive)
+                await message.channel.send(replyContent)
 
             #change the selected date. 
             elif messageList[1]=="date":
@@ -246,7 +275,7 @@ async def on_message(message, *args, **kwargs):
                         v = 1
                     
                         #Write new date and ver to XML
-                        XMLDateVer.writeDateVer(bingoDateStr,str(v))
+                        XMLDateVer.WriteDateVer(bingoDateStr,str(v),cardsActive)
 
                         #reset the cardList
                         c.bingoCardList.clear()
@@ -274,7 +303,7 @@ async def on_message(message, *args, **kwargs):
                         v=messageList[2]
 
                     #Write new date and ver to XML
-                    XMLDateVer.writeDateVer(bingoDateStr,str(v))
+                    XMLDateVer.WriteDateVer(bingoDateStr,str(v),cardsActive)
 
                     #reset the cardList
                     c.bingoCardList.clear()
@@ -380,15 +409,17 @@ async def on_message(message, *args, **kwargs):
                         print ("Replacelist run; ",str(sameCount),"items were already in the list, ",str(addCount), "items added, ",\
                         str(delCount),"items removed.")
 
-
-
-                        #amend existing cards, for if they have the item on their list
-                        userChangedString = allBingoItemRemovedModule.allBingoItemRemoved(bingoItemsRemoved)
-                        
-                        #message thread
-                        await message.channel.send("Replacelist run; "+str(sameCount)+" items were already in the list, "+str(addCount)+ \
+                        replyContent = "Replacelist run; "+str(sameCount)+" items were already in the list, "+str(addCount)+ \
                         " items attempted to add, "+str(delCount)+" items removed." + " There are now "+str(len(b.allBingoList))+ \
-                        " items in the bingo items list.\nUsers with changed bingocards: "+userChangedString+".")
+                        " items in the bingo items list."
+                        
+                        #amend existing cards, for if they have the item on their list
+                        if s.idempotentCardRequest == True:
+                            userChangedString = allBingoItemRemovedModule.allBingoItemRemoved(bingoItemsRemoved)
+                            replyContent += "\nUsers with changed bingocards: "+userChangedString+"."
+
+                        #message thread
+                        await message.channel.send(replyContent)
                             
                         #serialise
                         XML.writeList()
@@ -493,17 +524,20 @@ async def on_message(message, *args, **kwargs):
                         bingoItemsRemoved =[]
                         bingoItemsRemoved.append(selIndex)
 
+                        replyContent = "Item "+str(selIndex)+". \""+selItem.rawText+"\" removed."
+
                         #amend existing cards, for if they have the item on their list
-                        userChangedString = allBingoItemRemovedModule.allBingoItemRemoved(bingoItemsRemoved)
+                        #if idepotency is on
+                        if s.idempotentCardRequest == True:
+                            userChangedString = allBingoItemRemovedModule.allBingoItemRemoved(bingoItemsRemoved)
+                            replyContent += ("\nUsers with changed bingocards: "+userChangedString+".")
+                            #check that message length is not >2000 characters. 
 
-                        
-
-                        #delete the entry from the list. Need the python index, not the one assigned. 
+                        #delete the entry from the list. Need the python index, not the humanised index. 
                         del b.allBingoList[b.allBingoList.index(selItem)]
 
-                        content = "Item "+str(selIndex)+". \""+selItem.rawText+"\" removed. \n" + \
-                            "Users with changed bingocards: "+userChangedString
-                        await message.channel.send(content)
+                        await message.channel.send(replyContent)
+
                         XML.writeList()
 
                 elif messageList[2]=="change":
@@ -528,8 +562,8 @@ async def on_message(message, *args, **kwargs):
                         selItem.rawText = newRawText
 
                         #print(selItem.rawText)
-                        content = "Text change for item "+str(selItem.index)+" to: "+str(selItem.rawText)
-                        await message.channel.send(content)
+                        replyContent = "Text change for item "+str(selItem.index)+" to: "+str(selItem.rawText)
+                        await message.channel.send(replyContent)
                         XML.writeList()
 
                     #except Exception as e: 
@@ -539,35 +573,83 @@ async def on_message(message, *args, **kwargs):
                 elif messageList[2]=="view":
                     #prints a list of the allBingoList elements in the thread. Index + ". " + rawText
 
-                    content =""
+                    replyContent =""
                     for el in b.allBingoList:
-                        content = content+str(el.index) + ". "+el.rawText+"\n"
+                        replyContent = replyContent+str(el.index) + ". "+el.rawText+"\n"
 
-                    await message.channel.send(content)
+                    await message.channel.send(replyContent)
 
                 elif messageList[2]=="output":
                     #prints a list of the allBingoList elements to a text file and attaches it. Index + ". " + rawText
 
                     #content is one string, many lines, of allBingoList. In human readable form.
-                    content =""
+                    replyContent =""
                     for el in b.allBingoList:
-                        content = content+str(el.index) + ". "+el.rawText+"\n"
+                        replyContent = replyContent+str(el.index) + ". "+el.rawText+"\n"
 
                     #turn the variable content into a file to attach in message
-                    arr = io.StringIO(content)
+                    arr = io.StringIO(replyContent)
 
                     #send message
-                    await message.channel.send(content = "Bingo list attached.", file=File(fp=arr,filename="OutputList.txt"))
+                    await message.channel.send(replyContent = "Bingo list attached.", file=File(fp=arr,filename="OutputList.txt"))
 
                 elif messageList[2]=="sort":
 
-                    #Sort the allBingoList, reset the indexes. And write to XML.
-                    sortBingo()
-                    await message.channel.send("List sorted and reindexed.")
-                    XML.writeList()
+                    if s.idempotentCardRequest == True:
+                        await message.channel.send("This option is disabled with the option for consistent cards enabled. " /
+                        +"List will be sorted when the date or version is changed, when the cards database is reset.")
+                    else:
+                        #Sort the allBingoList, reset the indexes. And write to XML.
+                        sortBingo()
+                        await message.channel.send("List sorted and reindexed.")
+                        XML.writeList()
 
                 else:
                     await message.channel.send("Input error for list. Type \"!bingo ?\" for a list of valid commands.")
+
+            elif messageList[1]=="cardlist":
+
+                try:
+                    replyContent=""
+                    #view the list of users that have requested cards
+                    if messageList[2]=="view":
+                    
+                        userList= ["Cards active:"]
+                        for idu, u in enumerate(c.bingoCardList):
+                            userList.append(str(idu)+". "+u.userName)
+
+                        replyContent = "\n ".join(userList)
+                        #print cardDB entries
+                        #need the index in there; list index is fine. 
+                
+                    #delete the entry
+                    elif messageList[2]=="reset":
+                    
+                    
+                        delItem = messageList[3]
+                        print("delItem: "+str(delItem))
+                        print(delItem.isdigit())
+                        print("1".isdigit())
+
+                        if delItem == "all":
+                            #remove all entries
+                            c.bingoCardList.clear()
+                            replyContent = "All bingo cards deleted from the database."
+                            pass
+                        elif delItem.isdigit() == True:
+                            delObj = c.bingoCardList.pop(int(delItem))
+                            replyContent = "Card for "+delObj.userName+" deleted from the database."
+                        else:
+                            replyContent = "card reset failed. Index must be an integer in the list, or \"all\"."
+                        
+                        #XML
+                        XMLBingoCards.writeList()
+
+                except:
+                    replyContent = "Error processing cardList command. Type \"!bingo ? cardlist \" for a list of valid commands."
+
+                #check that message length is not >2000 characters. 
+                await message.channel.send(replyContent)
 
             else:
                 await message.channel.send("Command not recognised. Type \"!bingo ?\" for a list of valid commands")

@@ -52,7 +52,7 @@ def allBingoItemRemoved(bingoItemsRemoved):
                     if ab.index == cardItem.index:
                         #print (True)
                         try: tempABList.remove(ab)
-                        except: print("Could not remove item." + str(ab.index)+" "+str(cardItem.index))
+                        except: pass #print("Could not remove item." + str(ab.index)+" "+str(cardItem.index))
                         continue
 
             #select the replacement bingoItems
