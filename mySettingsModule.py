@@ -178,7 +178,7 @@ class mySettingsClass:
     FSBackgroundColor = "yellow"
     FSBackgroundOpacity = 100 # 0 is completely transparent, 255 is solid.
 
-    fileVersion = "0.3A"
+    fileVersion = "0.0.3A"
     freeSquareText="Free"
 
     """
