@@ -1,17 +1,22 @@
+import pathlib
 import datetime
-from datetime import date
+#from datetime import date
 from datetime import datetime
-from fileinput import filename
+#from fileinput import filename
 datetime.strftime
 
-from PIL import ImageFont, Image
+from PIL import ImageFont#, Image
 
 #@staticmethod
 class mySettingsClass:
-    """Stores global settings for solution that do not need to change."""
+    """Stores global settings for solution that do not need to change. These will be read at initialisation; if they change, to implement these 
+    changes, a restrart is required. 
 
-
+    Settings include things like appearance, array size, and behaviour such as idempotency of the card requests.
     """
+    """
+    
+    
     TD: 
     DONE freesquare text print
     DONE date and version
@@ -39,36 +44,60 @@ class mySettingsClass:
             "Free"
             What else? 
 
+    DONE made font local for transfer to VM. Licence?
+            
     DONE Write the help file to return.
     DONE Check the input file strip.
     DONE Option for printing the footers
 
-    Delete the picture cards when the date or version changes. 
+    DONE Delete the picture cards when the date or version changes. 
     
-    On off switch for assigning bingo cards. 
-
-    sort out the DM issue. Need an option for it. 
-    It also falls over on the moderator guild permission, because user doesn't have this property. Could either do something clever, or not.
-    Echo says only one guild for this list.
+    DONE On off switch for assigning bingo cards. 
 
     DONE Add in card consistency, which means a list of objects of these. 
     DONE Which also means serialisation.
-    Add a flipper option for this. To also control the behaviour for the sorting. Keep the CardDB, but replace the entry rather than returning the existing.
-    Or just delete the CardDB saving?
+    DONE Add a flipper option for this. Card sorting disabled when on. CardDB still exists. 
 
-    Add options for viewing or controlling the cardDB from Discord. 
+    DONE Add options for viewing or controlling the cardDB from Discord. 
+    DONE add helpfile 
 
-    Add the formatted text to the allBingoList and flip the logic so it's just pulling that rather than calcing every time. 
+    DONE Add printable version
+    DONE Add mod controlled add and remove for the bingoList
+
+    Sort out the DM issue. Need an option for it. One for mods, one for users. 
+    It also falls over on the moderator guild permission, because user doesn't have this property. Could either do something clever, or not.
+    Echo says only one guild for this list.
+
+    Add a status: date, ver, cardList len, bingo list len, 
+    Add setup status: arrayX, picture desired size and exists, bingolist len, ?
+
+    Add a reissue command: would need to store more than a string for the userName in cardList. 
+
+    Add lower to the message before splitting into messageList. 
+    See what else Brian said and tick them all off. 
+
+    Summary of all the learnings in folder, and all the changes required. 
+
+    Linting botModule
+    Linting CardGenModule
+    Linting TextWrap
+
+    You aren't deleting instances of allBingoList and cardList, you're just removing them from the list file. How do I deal with that? Otherwise you're adding to memory until a reset. 
+    Might be being collected automatically, need to do some more research or ask Brian. 
+
+    You're wiping the XMLs and rebuilding them every time. That's not very efficient, and doesn't allow exposing the settings in one settings file without writing the whole lot which would also be 
+    hard to code.
+
+    The replacelist code is wild, I think you're looping in loops more than you need to perhaps. Inefficient. An absolute shambles at best.
+
+    Add the formatted text to the allBingoList and flip the logic so it's just pulling that rather than calcing every time. Doesn't need to change until a restart and the mySettingsModule variables are pulled.
 
     Maybe something to tidy userName string. Like removing the special symbols from the Discord name print. Or can you even get it from the discord API? Sounds possible. 
     https://discord.com/developers/docs/reference message formatting section. For emojis.
 
+    check that message length is not >2000 characters. For when you're including user names. Which is on cardList view, and list replace and remove.
+    
     Add default header and freesquare image, and get it to cope if the images are missing completely.
-    DONE Add printable version
-    DONE Add mod controlled add and remove for the bingoList
-    https://stackoverflow.com/questions/71174697/discord-js-v13-how-to-prevent-mod-commands-from-working-on-mods
-    the above is for js mind. 
-
     Check all the logic if the imagesizes are wrong. They did work, but you might have broken them in tidying up.
 
     API:            https://discordpy.readthedocs.io/en/stable/ext/commands/api.html
@@ -85,9 +114,20 @@ class mySettingsClass:
         Lottie	.json
 
     """
+    #Options:
+    
+    #Behavior options:
+        
+    messageChannel = False
+    messageUser = True
+
+    saveCards = False #save the generated bingo cards in a folder.
+    idempotentCardRequest = True #card requests for a date and version will be consistent. If false a second request will just overwrite in the card DB, the DB will still exist. 
 
     arrayX =5 #how big the bingo card is.
     freeSquare = True #prints a freesquare in the centreSquare with an image.
+
+    #Visual options:
 
     titleStr = "Echo Ridge Gaming\nBingo"
     titleFontSize = 50 #this and the above is used for the printable version, and as a fall back if there is no title image found. 
@@ -105,11 +145,15 @@ class mySettingsClass:
     
     #this doesn't like just the name, it's supposed to look in the system folder determined by path but it appears to be busto.
     #Adding to path in windows: https://stackoverflow.com/questions/49966547/pip-10-0-1-warning-consider-adding-this-directory-to-path-or
-    #this will need to be changed updated for unix. Can just copy required fonts locally and reference there. 
+    #this will need to be changed updated for unix. Could potentially just copy required fonts locally and reference there. 
     #It may auto search unix folders with just the name string but that is not clear from a quick google. Failed with fonts in your font folder too, so don't know. 
-    fontPath="C:\\Users\\Name\\AppData\\Local\\Microsoft\\Windows\\Fonts\\Lato-Black.ttf" 
+    #You have put a copy of the font that you've used locally
+    parentPathStr = str(pathlib.Path(__file__).parent.resolve())
+    elementsPath = parentPathStr+"\\obj\\Fonts\\"
+    print(elementsPath)
+    fontPath=elementsPath+"Lato-Black.ttf" 
     
-    #fontAlign = "center" #taken out as it gets complicated with left align, and looks super spiffy center aligned. 
+    #fontAlign = "center" #taken out as it gets complicated with left align, and looks super spiffy center aligned. So it's hard set.
     fontColor = "black"
     
     #Font footer options
@@ -120,16 +164,10 @@ class mySettingsClass:
     footerIndent = 10
     footerOpacity = 100
 
-    persistentCard = True #not currently functional. Need list and serialisation. 
-
-    messageChannel = False
-    messageUser = True
-
-    saveCards = False #save the generated bingo cards in a folder. 
 
     headerHeight = 200
-    borderSize = 50
-    boxSize = 100
+    borderSize = 50 #round the outside of the boxes. Needs to be something, to leave space for the Username and date at the bottom, if they are enabled. 
+    boxSize = 100 #that the bingo items go in
     boxPadding = 6 #this is the space inside the box before the text is printed, boxPadding/2 per side.
 
     lineWidth = 3

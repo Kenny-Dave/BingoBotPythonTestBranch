@@ -7,7 +7,7 @@ from datetime import datetime
 
 parentPathStr = str(pathlib.Path(__file__).parent.resolve())
 XMLPath = parentPathStr+"\\obj\\DataStore\\"
-XMLFile = XMLPath+"DateVer.xml"
+XMLFile = XMLPath+"Settings.xml"
 
 try:
     global XMLTree
@@ -15,30 +15,24 @@ try:
     XMLRoot=XMLTree.getroot()
 
 except: 
-    print("No date and version found. Reverting to default.")
+    print("No cardsActive value found")
 
-def readDateVer():
+def ReadCardsActive():
     
-    bingoDateStr="01/01/00"
-    bingoDate = datetime.strptime(bingoDateStr, '%d/%m/%y')
-    v=1
     cardsActive=True
 
     try:
         for ri in XMLTree.iter("*"):
         
-            if ri.tag == "bingoDateStr":
-                bingoDateStr = ri.text
-                bingoDate = datetime.strptime(bingoDateStr, '%d/%m/%y')
-            if ri.tag == "v":
-                v =int(ri.text)
+            if ri.tag =="cardsActive":
+                cardsActive=bool(ri.text)
     except:
         #print("No date and version found. Reverting to default.")
-        WriteDateVer(bingoDateStr, v)
+        WriteCardsActive(cardsActive)
 
-    return bingoDate, v
+    return cardsActive
 
-def WriteDateVer(bingoDateStr, v):
+def WriteCardsActive(cardsActive):
 
     #because when there isn't anything in the file it can skip the parsing, so need to do it again here. 
     global XMLTree
@@ -51,15 +45,10 @@ def WriteDateVer(bingoDateStr, v):
         
         XMLTree=ET.ElementTree(XMLRoot)
 
-    #write the bingoDateStr to XML
-    bD = ET.Element("bingoDateStr")
-    bD.text=bingoDateStr
-    XMLRoot.append(bD)
-
-    #write the version to XML
-    vV = ET.Element("v")
-    vV.text=str(v)
-    XMLRoot.append(vV)
+    #write the cardsActive to XML
+    cA = ET.Element("cardsActive")
+    cA.text=str(cardsActive)
+    XMLRoot.append(cA)
 
     #save new XML
     ET.indent(XMLRoot,"    ")

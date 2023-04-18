@@ -110,6 +110,5 @@ def writeList():
             XMLRoot.append(noo)
 
     print ("bingoCardList len:"+str(len(c.bingoCardList)))
-    print ("XMLCard written.")
     ET.indent(XMLRoot,"    ")
     XMLTree.write(XMLFile)
