@@ -63,6 +63,10 @@ class mySettingsClass:
 
     DONE Add printable version
     DONE Add mod controlled add and remove for the bingoList
+    DONE Summary of all the learnings in folder, and all the changes required. 
+    DONE See what else Brian said and tick them all off. This is in the code-monkeys thread
+
+    DONE Add lower to the message before splitting into messageList. 
 
     Sort out the DM issue. Need an option for it. One for mods, one for users. 
     It also falls over on the moderator guild permission, because user doesn't have this property. Could either do something clever, or not.
@@ -72,11 +76,6 @@ class mySettingsClass:
     Add setup status: arrayX, picture desired size and exists, bingolist len, ?
 
     Add a reissue command: would need to store more than a string for the userName in cardList. 
-
-    Add lower to the message before splitting into messageList. 
-    See what else Brian said and tick them all off. This is in the code-monkeys thread
-
-    DONE Summary of all the learnings in folder, and all the changes required. 
 
     Linting botModule
     Linting CardGenModule
