@@ -64,14 +64,17 @@ def selBingItem(selIndex):
     return selItem
 
 def sortBingo():
-    #sorts the bingo list and resets the artificial index to the list index+1
+    """sorts the bingo list and resets the artificial index to the list index+1"""
     b.allBingoList.sort(key=lambda x: x.rawText)
 
     for it in b.allBingoList:
         #print(it.rawText)
         it.index = b.allBingoList.index(it)+1
 
+
+
 def clean(rawText):
+    """this cleans the input string, or lines if it's an input file"""
 
     #removing or changing characters that will confuse XML.
     for char in rawText:
@@ -102,6 +105,7 @@ async def on_ready():
         )
 
     print("Bingo list entries: "+str(len(b.allBingoList)))
+    print("Working directory: "+parentPathStr)
 
 @client.event
 async def on_message(message, *args, **kwargs):
@@ -155,21 +159,34 @@ async def on_message(message, *args, **kwargs):
     #exits if message is from self, to avoid loops
     if message.author == client.user:
         return
-    
-    #splits the message by spaces to evaluate each option. 
-    #note that this is complicated by the list items containing spaces, a solution is done for that locally. 
-    messageList=message.content.split()
 
-    if message.content.startswith("!bingo"):
+    #so that it can ignore case in input
+    messageContentLower = message.content.lower()
+
+    if messageContentLower.startswith("!bingo"):
+
+            #splits the message by spaces to evaluate each option. 
+            #note that this is complicated by the list items containing spaces, a solution is done for that locally. 
+            messageList=messageContentLower.split()
 
             replyContent =""
             global cardsActive
 
+            
+            #check if user has mod permissions on any of the linked guild. If they do, they can do mod commands here. 
+            memberHasModPermission = False
+
+            for guild in client.guilds:
+                member = await guild.fetch_member(message.author.id)
+                #print("Message author ID: "+str(message.author.id))
+                #print ("Member guild permissions: "+str(member.guild_permissions.moderate_members))
+                if member.guild_permissions.moderate_members==True:
+                    memberHasModPermission = True
+                    break
+
         #try:
             #draws standard bingo card
             if len(messageList)==1: 
-
-
 
                 if s.arrayX**2>len(b.allBingoList):
                     replyContent = "There are not enough items in the bingo list to generate a card. " \
@@ -220,7 +237,7 @@ async def on_message(message, *args, **kwargs):
                 await message.channel.send(replyContent)
 
             #Prints the contents of the helpfile to the thread
-            elif messageList[1]=="?":
+            elif messageList[1]=="?" or messageList[1]=="help":
 
                 #user commands help file
                 if len(messageList)==2:
@@ -238,7 +255,8 @@ async def on_message(message, *args, **kwargs):
 
             #commands beyond this point are restricted to moderators only, for amending lists etc.
             #currently causes failure for DMs. Need to set it to check the modmin permission for the attached guild.
-            elif message.author.guild_permissions.moderate_members==False:
+
+            elif memberHasModPermission==False:
                 await message.channel.send("Only moderators have permission to access mod commands, and you do not seem to.")
 
             #make card issue active or inactive
@@ -251,6 +269,7 @@ async def on_message(message, *args, **kwargs):
                     cardsActive = True 
                     replyContent = "Card issue is now active. Users will be able to request a card."
                     XMLSettings.WriteCardsActive(cardsActive)
+
                 await message.channel.send(replyContent)
 
             #change the selected date. 
@@ -261,21 +280,30 @@ async def on_message(message, *args, **kwargs):
 
                 if len(messageList)==2:
                     
-                    await message.channel.send("Currently set date is: "+bingoDate.strftime("%d %b %y")+" Version is v"+str(v)+".")
+                    await message.channel.send("Currently set date is: "+bingoDate.strftime("%d %b %y")+", Version is v"+str(v)+".")
                 else:
                     #stripping the control from the message, to leave only new date.
                     global bingoDateStr
-                    bingoDateStr = message.content.lstrip("!bingo date \"").rstrip("\"")
                 
                     #Setting. 
-                    try:
+                    def bingoDateFunction():
+                        try:
+                            bingoDateStr = message.content.lstrip("!bingo date \"").rstrip("\"")
+                            #print(bingoDateStr)
+                            bingoDate = datetime.strptime(bingoDateStr, '%d/%m/%y')
+                            return bingoDate, 1
 
-                        bingoDate = datetime.strptime(bingoDateStr, '%d/%m/%y')
+                        except:
+                            return "", v
 
-                        v = 1
-                    
+                    bingoDate, v = bingoDateFunction()
+
+                    if bingoDate == "": 
+                        await message.channel.send("Could not read new date correctly. Please ensure it is in the format dd/mm/yy, e.g. 25/03/23.")
+                    else:
+
                         #Write new date and ver to XML
-                        XMLDateVer.WriteDateVer(bingoDateStr,str(v),cardsActive)
+                        XMLDateVer.WriteDateVer(bingoDateStr,str(v))
 
                         #reset the cardList
                         c.bingoCardList.clear()
@@ -286,10 +314,8 @@ async def on_message(message, *args, **kwargs):
                         XML.writeList()
 
                         await message.channel.send("bingoDate changed to "+bingoDate.strftime("%d %b %Y")+ \
-                                                   ". Version reset to 1. Bingo List sorted and reindexed.")
-                
-                    except:
-                        await message.channel.send("Could not read new date correctly. Please ensure it is in the format dd/mm/yy, e.g. 25/03/23.")
+                                                    ". Version reset to 1. Bingo List sorted and reindexed.")
+                    
 
             elif messageList[1]=="version":
                 #increments or changes the version, while keeping the date the same. If more than one bingo game for a date. 
@@ -303,7 +329,7 @@ async def on_message(message, *args, **kwargs):
                         v=messageList[2]
 
                     #Write new date and ver to XML
-                    XMLDateVer.WriteDateVer(bingoDateStr,str(v),cardsActive)
+                    XMLDateVer.WriteDateVer(bingoDateStr,str(v))
 
                     #reset the cardList
                     c.bingoCardList.clear()
