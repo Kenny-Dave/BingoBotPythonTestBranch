@@ -24,8 +24,8 @@ def ReadCardsActive():
     try:
         for ri in XMLTree.iter("*"):
         
-            if ri.tag =="cardsActive":
-                cardsActive=bool(ri.text)
+            if ri.tag == "cardsActive":
+                cardsActive = ri.text == "True"
     except:
         #print("No date and version found. Reverting to default.")
         WriteCardsActive(cardsActive)

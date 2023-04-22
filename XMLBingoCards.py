@@ -5,8 +5,6 @@ import random
 import BingoCardListFactoryModule as c
 import AllBingoListFactoryModule as b
 
-
-
 #from bingoCardListFactoryModule import bingoCardItemClass
 parentPathStr = str(pathlib.Path(__file__).parent.resolve())
 #print (parentPathStr)
@@ -32,15 +30,23 @@ def readList():
     for ri in XMLTree.iter("card"):
 
         userName=""
+        userID=0
+        cardChanged=False
+        drawPrintable=False
         bingoItemListIndex=[] #just the indexes
         bingoItemList = [] #allBingoList objects
 
         for attr in ri:
             if attr.tag=="userName":
                 userName=attr.text
+            elif attr.tag=="userID":
+                userID=attr.text
+            elif attr.tag=="cardChanged":
+                cardChanged = attr.text =="True"
+            elif attr.tag=="drawPrintable":
+                drawPrintable = attr.text =="True"
             
             elif attr.tag=="bingoItemList":
-
                 
                 for bi in attr:
                 
@@ -75,7 +81,7 @@ def readList():
 
                         bingoItemList.append(random.choice(tempABList))
 
-        c.NewBingoCard(userName,bingoItemList, XMLAppend = False)
+        c.NewBingoCard(userName, userID, cardChanged, bingoItemList, drawPrintable = drawPrintable)
 
 def writeList():
     #write to XML
@@ -97,8 +103,14 @@ def writeList():
 
 
             noo = ET.Element("card")
-            rt = ET.SubElement(noo,"userName")
-            rt.text=item.userName
+            userName = ET.SubElement(noo,"userName")
+            userName.text=item.userName
+            userID = ET.SubElement(noo,"userID")
+            userID.text=str(item.userID)
+            cardChanged = ET.SubElement(noo,"cardChanged")
+            cardChanged.text=str(item.cardChanged)
+            drawPrintable = ET.SubElement(noo,"drawPrintable")
+            drawPrintable.text=str(item.drawPrintable)
 
             bl = ET.SubElement(noo,"bingoItemList")
 
@@ -109,6 +121,6 @@ def writeList():
 
             XMLRoot.append(noo)
 
-    print ("bingoCardList len:"+str(len(c.bingoCardList)))
+    #print ("bingoCardList len:"+str(len(c.bingoCardList)))
     ET.indent(XMLRoot,"    ")
     XMLTree.write(XMLFile)
