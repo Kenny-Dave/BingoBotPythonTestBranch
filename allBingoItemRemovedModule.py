@@ -1,5 +1,6 @@
 from BingoCardListFactoryModule import bingoCardList 
 import AllBingoListFactoryModule as b
+import XMLBingoCards
 
 import random
 
@@ -41,7 +42,9 @@ def allBingoItemRemoved(bingoItemsRemoved):
         if len(itemsToChangeList) !=0:
             
             usersChangedList.append(card.userName)
-
+            card.cardChanged = True
+            
+            #print("User: "+card.userName+".\nCardChanged = True.")
             #print ("bingoItemList len: "+str(len(card.bingoItemList)))
 
             for cardItem in card.bingoItemList:
@@ -72,7 +75,10 @@ def allBingoItemRemoved(bingoItemsRemoved):
                         n +=1
                         break
     
-    if len(usersChangedList)==0: usersChangedList.append("None")
+    if len(usersChangedList)==0: 
+        usersChangedList.append("None")
+    else: 
+        XMLBingoCards.writeList()
 
     #for messaging the users with changed cards to channel.
     usersChangedString = ", ".join(usersChangedList)

@@ -7,7 +7,7 @@ Available commands are:
 		This prints a low ink bingo card, if you want to print it out on paper to complete. 
 		
 	"bingo! about"
-		This tells gives you version info about this bingoBot (I work very hard you know. I've got this pain in my diodes all down my left side). 
+		This tells gives you version info about this bingoBot (I work very hard you know. And I've got this pain in my diodes all down my left side). 
 
 	"!bingo ?"
 		This prints this document in the thread.

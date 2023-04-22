@@ -2,28 +2,29 @@
 
 bingoCardList=[]
 
-def NewBingoCard(userName,bingoItemList, XMLAppend):
+def NewBingoCard(userName, userID, cardChanged, bingoItemList, drawPrintable):
     
     #create item
-    bingoCardItem = bingoCardItemClass(userName,bingoItemList)
+    bingoCardItem = bingoCardItemClass(userName, userID, cardChanged, bingoItemList, drawPrintable)
 
     #add to list, unless...
     if userName !="": bingoCardList.append(bingoCardItem)
 
-    #add to XML, not built yet.
-    if XMLAppend == True:
-        pass
-
     return bingoCardList
-
-
 
 class bingoCardItemClass():
 
     userName = ""
+    userID=0
     bingoItemList = []
+    cardChanged = False
+    drawPrintable = False
     
-    def __init__(self,userName, bingoItemList):
+    def __init__(self,userName, userID, cardChanged, bingoItemList, drawPrintable):
 
         self.userName = userName
         self.bingoItemList = bingoItemList
+        self.cardChanged = cardChanged
+        self.userID = userID
+        self.drawPrintable = drawPrintable
+

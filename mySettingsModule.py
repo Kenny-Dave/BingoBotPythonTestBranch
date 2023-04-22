@@ -68,14 +68,14 @@ class mySettingsClass:
 
     DONE Add lower to the message before splitting into messageList. 
 
-    Sort out the DM issue. Need an option for it. One for mods, one for users. 
-    It also falls over on the moderator guild permission, because user doesn't have this property. Could either do something clever, or not.
+    DONE Sort out the DM issue. Need an option for it. One for mods, one for users. 
+    DONE It also falls over on the moderator guild permission, because user doesn't have this property. 
     Echo says only one guild for this list.
 
-    Add a status: date, ver, cardList len, bingo list len, 
+    DONE Add a status: date, ver, cardList len, bingo list len, 
     Add setup status: arrayX, picture desired size and exists, bingolist len, ?
 
-    Add a reissue command: would need to store more than a string for the userName in cardList. 
+    DONE Add a reissue command: would need to store more than a string for the userName in cardList. 
 
     Linting botModule
     Linting CardGenModule
@@ -149,7 +149,6 @@ class mySettingsClass:
     #You have put a copy of the font that you've used locally
     parentPathStr = str(pathlib.Path(__file__).parent.resolve())
     elementsPath = parentPathStr+"\\obj\\Fonts\\"
-    print(elementsPath)
     fontPath=elementsPath+"Lato-Black.ttf" 
     
     #fontAlign = "center" #taken out as it gets complicated with left align, and looks super spiffy center aligned. So it's hard set.
@@ -177,7 +176,7 @@ class mySettingsClass:
     FSBackgroundColor = "yellow"
     FSBackgroundOpacity = 100 # 0 is completely transparent, 255 is solid.
 
-    fileVersion = "0.0.3A"
+    fileVersion = "0.0.4A"
     freeSquareText="Free"
 
     """

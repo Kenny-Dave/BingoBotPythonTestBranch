@@ -10,11 +10,14 @@ Other:
 		makes bingo card printing active or inactive. 
 	"!bingo date"
 		prints the date and version.
-	"!bingo date "01/01/00""
-		This changes the date on the bingo cards. 
+	"!bingo date "dd/mm/yy""
+		This changes the date on the bingo cards to dd/mm/yy. 
 	"!bingo version"
 		This increments the version of the bingo card, for if more than one bingo session is run on one day. 
 	"!bingo version n"
 		Sets the version to n.
 	
-Cards will be the same for a user on a date and version, if the server owner has enabled this option. Changing the date or version will delete all existing Card records, so users will receive a rerandomised card on request after this. 
+Reissued cards will be the same for a user on a date and version, if the server owner has enabled this option. Changing the date or version will delete all existing Card records, so users will receive a rerandomised card on request after this. 
+
+	"!bingo status"
+		Shows the status of the current bingo game and database.
