@@ -15,5 +15,5 @@ Available commands are:
 For a list of commands for managing the bot, available only to moderators, type:
 
 	"!bingo ? mod"
-	"!bingo ? list" displays the list commands.
+	"!bingo ? list" displays the list commands.The list being the possible bingo card elements.
 	"!bingo ? cardlist" displays the cardlist commands. The cardlist is the list of users who have requested a bingo card. 

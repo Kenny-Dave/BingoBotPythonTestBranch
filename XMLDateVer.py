@@ -1,66 +1,61 @@
+import os
 import xml.etree.ElementTree as ET
-import pathlib
 from datetime import datetime
 
-#import AllBingoListFactoryModule as b
-#from AllBingoListFactoryModule import AllBingoItemClass
-
-parentPathStr = str(pathlib.Path(__file__).parent.resolve())
-XMLPath = parentPathStr+"\\obj\\DataStore\\"
-XMLFile = XMLPath+"DateVer.xml"
+XMLFile = os.path.join(os.path.curdir, "obj", "DataStore", "DateVer.xml")
 
 try:
-    global XMLTree
-    XMLTree=ET.parse(XMLFile)
-    XMLRoot=XMLTree.getroot()
+    XMLTree = ET.parse(XMLFile)
+    XMLRoot = XMLTree.getroot()
 
-except: 
+except:
     print("No date and version found. Reverting to default.")
 
+
 def readDateVer():
-    
-    bingoDateStr="01/01/00"
-    bingoDate = datetime.strptime(bingoDateStr, '%d/%m/%y')
-    v=1
-    cardsActive=True
+    bingoDateStr = "01 Jan 00"
+    bingoDate = datetime.strptime(bingoDateStr, "%d %b %y")
+    v = 1
+    global XMLTree
 
     try:
         for ri in XMLTree.iter("*"):
-        
+
             if ri.tag == "bingoDateStr":
                 bingoDateStr = ri.text
-                bingoDate = datetime.strptime(bingoDateStr, '%d/%m/%y')
+                bingoDate = datetime.strptime(bingoDateStr, "%d %b %y")
             if ri.tag == "v":
-                v =int(ri.text)
+                v = int(ri.text)
     except:
-        #print("No date and version found. Reverting to default.")
+        # print("No date and version found. Reverting to default.")
         WriteDateVer(bingoDateStr, v)
 
     return bingoDate, v
 
-def WriteDateVer(bingoDateStr, v):
 
-    #because when there isn't anything in the file it can skip the parsing, so need to do it again here. 
+def WriteDateVer(bingoDateStr, v):
+    # because when there isn't anything in the file it can skip the parsing, so need to do it again here.
     global XMLTree
+    global XMLRoot
     try:
         for rootItem in XMLRoot.findall("*"):
             XMLRoot.remove(rootItem)
             XMLTree.write(XMLFile)
-    except: 
-        XMLRoot=ET.Element("Root")
-        
-        XMLTree=ET.ElementTree(XMLRoot)
+    except:
+        XMLRoot = ET.Element("Root")
 
-    #write the bingoDateStr to XML
+        XMLTree = ET.ElementTree(XMLRoot)
+
+    # write the bingoDateStr to XML
     bD = ET.Element("bingoDateStr")
-    bD.text=bingoDateStr
+    bD.text = bingoDateStr
     XMLRoot.append(bD)
 
-    #write the version to XML
+    # write the version to XML
     vV = ET.Element("v")
-    vV.text=str(v)
+    vV.text = str(v)
     XMLRoot.append(vV)
 
-    #save new XML
-    ET.indent(XMLRoot,"    ")
+    # save new XML
+    ET.indent(XMLRoot, "    ")
     XMLTree.write(XMLFile)

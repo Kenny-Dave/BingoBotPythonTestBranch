@@ -1,9 +1,0 @@
-Type: "!bingo cardlist " plus the following:
-
-view: prints a list of the active cards for this date and version, with index.
-
-"reset 6": resets card 6 from the list above. This means that the user will receive a new card, i.e. new entries, when they rerequest one, or when a mod reissues changed cards. The indexes will reset after you've deleted an entry, so if you are deleting multiple, ensure you view the list again in between. 
-
-"reset all": resets all active cards, so users can rerequest a new card. 
-
-"reissue": this reissues cards to users with ammended cards via DM.
